@@ -28,6 +28,16 @@ def main():
         max_num_hands=2, min_detection_confidence=0.7
     ) as hands:
 
+        # ウィンドウを作成（リサイズ可能にする）
+        window_name = "Ad System MVP"
+        cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+
+        # ウィンドウサイズを指定
+        cv2.resizeWindow(window_name, 1280, 720)
+
+        f"if advertisement appear, shake your hand from left to right"
+
+
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -63,7 +73,8 @@ def main():
                     # 人差し指の座標も表示
                     hand_debug_msg += f" | hand{i+1}: x={x}"
 
-                    if prev_hand_x is not None and abs(x - prev_hand_x) > 35:
+                    # ～以上動いたらスワイプ
+                    if prev_hand_x is not None and abs(x - prev_hand_x) > 100:
                         swipe_detected = True
                         hand_debug_msg += "[swipe detected!]"
 
@@ -92,10 +103,18 @@ def main():
                 ad.draw(frame)
 
             # デバッグ情報を画面に表示
-            cv2.putText(frame, hand_debug_msg, (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255, 0), 2)
+            # cv2.putText(frame, hand_debug_msg, (10, 30),
+            # cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255, 0), 2)
 
-            cv2.imshow("Ad System MVP", frame)
+            # システムの説明
+            instruct_msg1 = "If advertisement appears, "
+            instruct_msg2 = "shake your hand to dismiss it"
+            cv2.putText(frame, instruct_msg1, (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(frame, instruct_msg2, (10, 60),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+            cv2.imshow(window_name, frame)
             if cv2.waitKey(1) & 0xFF == 27:  # ESCで終了
                 break
 

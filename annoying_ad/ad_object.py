@@ -9,6 +9,8 @@ class AdObject:
         self.x, self.y = start_pos
         self.state = "coming"
         self.speed = 0.08  # 係数8パーセント
+        self.offset_x = random.randint(-50, 50)
+        self.offset_y = random.randint(-50, 50)
 
         # デバッグ：現在のディレクトリと画像ファイルの存在確認
         print(f"現在のディレクトリ: {os.getcwd()}")
@@ -31,7 +33,7 @@ class AdObject:
         if self.image is not None:
             print("画像読み込み成功")
             # 画像のサイズを調整（90×50ピクセルに変更）
-            self.image = cv2.resize(self.image, (90, 50))
+            self.image = cv2.resize(self.image, (270, 150))
             self.img_height, self.img_width = self.image.shape[:2]
         else:
             print("画像読み込み失敗 - フォールバック使用")
@@ -65,8 +67,8 @@ class AdObject:
         if self.state in ("coming", "blocked"):
             if self.image is not None:
                 # 単純に現在位置(self.x, self.y)で画像を描画
-                x1 = int(self.x) - self.img_width // 2
-                y1 = int(self.y) - self.img_height // 2
+                x1 = int(self.x) - (self.img_width // 2) + self.offset_x
+                y1 = int(self.y) - (self.img_height // 2) + self.offset_y
                 x2 = x1 + self.img_width
                 y2 = y1 + self.img_height
 
