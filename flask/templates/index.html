@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.scss') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" id="logo">
+
+    <!-- カルーセルをscene内に配置 -->
+    <div class="scene">
+        <div class="carousel">
+            <div class="carousel__item"><a href="{{ url_for('carousel1') }}"><img src="{{ url_for('static', filename='images/wiisports.png') }}" width="240" height="126.25"></a></div>
+            <div class="carousel__item"><a href="{{ url_for('carousel2') }}"><img src="{{ url_for('static', filename='images/sumabura.jpg') }}" width="240" height="126.25"></a></div>
+            <div class="carousel__item"><a href="{{ url_for('carousel3') }}"><img src="{{ url_for('static', filename='images/mario.jpg') }}" width="240" height="126.25"></a></div>
+            <div class="carousel__item">4</div>
+            <div class="carousel__item">5</div>
+            <div class="carousel__item">6</div>
+            <div class="carousel__item">7</div>
+            <div class="carousel__item">8</div>
+        </div>
+
+        <!-- 前後ボタンもscene内に -->
+        <div class="carousel__prev"></div>
+        <div class="carousel__next"></div>
+    </div>
+
+    <div id="clock"></div>
+    <div id="date"></div>
+</body>
+</html>
