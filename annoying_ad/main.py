@@ -1,8 +1,17 @@
+from pydoc import describe
 import cv2
 import mediapipe as mp
 import time
+from pathlib import Path
 
 from ad_object import AdObject, random_start
+from fuck_shutdown import check_middle_finger_gesture, is_fuck, draw_hand_landmarks
+
+# 広告表示のオンオフを切り替えるデバッグフラグ
+enable_ads = True  # Trueで表示、Falseで非表示
+
+# fuckdownのオンオフ切り替え
+enable_fuckdown = False
 
 # Mediapipenの初期化
 mp_face = mp.solutions.face_detection
@@ -31,6 +40,10 @@ def main():
         # ウィンドウを作成（リサイズ可能にする）
         window_name = "Ad System MVP"
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+
+        # アプリ起動時にウィンドウを最前面に
+        # 引数の1は、topmostを有効にする、という意味らしい
+        cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
 
         # ウィンドウサイズを指定
         cv2.resizeWindow(window_name, 1280, 720)
@@ -80,11 +93,14 @@ def main():
 
                     prev_hand_x = x
 
+                    # デバッグ: ランドマークを描画 fuckデバッグ用
+                    # draw_hand_landmarks(frame, hand, w, h)
+
             else:
                 hand_debug_msg = "no hand detected"
 
             # 顔が見えている時だけ広告オブジェクトを出現させる
-            if face_center:
+            if enable_ads and face_center:
                 if time.time() - last_spawn > 1.5:  # 1.5秒ごとに広告生成
                     start_pos = random_start(w, h)
                     ads.append(AdObject(start_pos))
@@ -107,16 +123,52 @@ def main():
             # cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255, 0), 2)
 
             # システムの説明
-            instruct_msg1 = "If advertisement appears, "
-            instruct_msg2 = "shake your hand to dismiss it"
-            cv2.putText(frame, instruct_msg1, (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            cv2.putText(frame, instruct_msg2, (10, 60),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            # instruct_msg1 = "If advertisement appears, "  # (10, 30)
+            # instruct_msg2 = "shake your hand to dismiss it"
+            # cv2.putText(frame, instruct_msg1, (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+            # cv2.putText(frame, instruct_msg2, (10, 60),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
 
+            # システム説明画像
+            img_path = Path(__file__).parent / "img" / "ad_describe.png"
+            describe_img = cv2.imread(str(img_path))
+            describe_img = cv2.resize(describe_img, (200, 75))
+
+            ih, iw = describe_img.shape[:2]
+            frame[0:ih, 0:iw] = describe_img
+
+            # 画面への出力
             cv2.imshow(window_name, frame)
+
             if cv2.waitKey(1) & 0xFF == 27:  # ESCで終了
+                print("escが押された")
                 break
+
+            if enable_fuckdown == True:
+                if is_fuck(hands_res, w, h):
+                    print("fuck detected!!")
+                    shutdownText = "...fuck_you"
+
+                    # テキストのサイズを取得
+                    font = cv2.FONT_HERSHEY_TRIPLEX
+                    font_scale = 1.0 # フォントの大きさ
+                    font_color = (0, 0, 255) # フォント：赤
+                    thickness = 2 # フォントの太さ
+
+                    (text_width, text_height), baseline = cv2.getTextSize(
+                        shutdownText, font, font_scale, thickness
+                    )
+
+                    # 画面の中心座標を計算（テキストの中心が画面の中心になるように）
+                    text_x = (w - text_width) // 2
+                    text_y = (h + text_height) // 2 # putTextは左下角を指定するため
+
+                    cv2.putText(frame, shutdownText, (text_x, text_y),
+                                font, font_scale, font_color, thickness)
+                    cv2.imshow(window_name, frame)
+                    cv2.waitKey(2000)
+                    break
 
     cap.release()
     cv2.destroyAllWindows()

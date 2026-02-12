@@ -19,18 +19,18 @@ class Headgear:
         self.img = self.original_img.resize((int(w * scale), int(h * scale)))
         #リサイズ後のサイズを保存
         self.width, self.height = self.img.size
-        
+
         # 現在の動作モード
         self.mode = "follow"
         # 初期位置をnumpy配列として保存
         self.initial_pos = np.array(position, dtype=np.float32)
         self.pos = self.initial_pos.copy()
         self.radius = max(self.width, self.height) / 2  # 当たり判定半径
-        
+
     # キャラクターの中心座標を更新
     def set_position(self, point):
         self.pos = np.array(point, dtype=np.float32)
-    
+
     # 現在の座標を中心に、画像を背景に重ねる
     def draw(self, pil_frame):
         cx, cy = self.pos
@@ -63,7 +63,7 @@ class Headgear:
 
     # 頭がキャラクターに触れたら、頭の位置に吸着する、左右の手がキャラクターの両端に触れていたら、両手の中間地点に移動する
     def update(self, head_xy, right_xy, left_xy):
-        
+
         touching_left  = self._touch_left_edge(left_xy)
         touching_right = self._touch_right_edge(right_xy)
 
@@ -75,7 +75,7 @@ class Headgear:
             if right_xy is not None and left_xy is not None:
                 mid = (right_xy + left_xy) / 2.0
                 self.set_position(mid)
-                print("両手タッチ") 
+                print("両手タッチ")
 
 class Button:
     def __init__(self, image_path, position=(0, 0), scale=2.0, rotation_speed = 0.0):
@@ -85,12 +85,12 @@ class Button:
         w, h = self.original_img.size
         self.img = self.original_img.resize((int(w * scale), int(h * scale)))
         self.width, self.height = self.img.size
-        
+
         self.mode = "follow"
         self.initial_pos = np.array(position, dtype=np.float32)
         self.pos = self.initial_pos.copy()
         self.radius = max(self.width, self.height) / 2  # 当たり判定半径
-        
+
     def set_position(self, point):
         self.pos = np.array(point, dtype=np.float32)
 
@@ -157,17 +157,17 @@ while True:
         x = int(Reset_Left.x * w)
         y = int(Reset_Left.y * h)
         Reset_Left_xy = np.array([x, y])
-        
+
         # resetボタンの判定　指先がボタンに触れたかチェック
         hit_right = remove.is_touch(Reset_Right_xy,ratio=2.0)
         hit_left = remove.is_touch(Reset_Left_xy,ratio=2.0)
         print(f"Hit Left: {hit_left}, Right: {hit_right}")
-    
+
     # どちらかの手がリセットボタンに触れたらキャラクターの位置を初期位置に強制移動
     if hit_right or hit_left:
         print("脱ぐボタンタッチ")
         follow.set_position((310,425))  # 元の位置に戻す
-        
+
     # キャラ描画は毎フレーム
     image = cv2.cvtColor(frame_rgb, cv2.COLOR_BGR2RGB) # OpenCV形式からPIL形式に変換
     frame_PIL = Image.fromarray(image)
@@ -178,10 +178,21 @@ while True:
     frame_PIL_Draw = remove.draw(frame_PIL_Draw)
     #脱ぐボタンを表示するためにPIL形式からOpenCV形式に戻す
     frame_cv = Func05_pil2opencv(frame_PIL_Draw)
-    
-    # ウェインドウ作成と表示
+
+
+
+    """ウェインドウ作成と表示"""
+    # ウィンドウを作成（リサイズ可能にする）
     window_name = "kutipatti"
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+
+    # アプリ起動時にウィンドウを最前面に
+    # 引数の1は、topmostを有効にする、という意味らしい
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
+
+    # ウィンドウサイズを指定
+    cv2.resizeWindow(window_name, 1280, 720)
+
     cv2.imshow(window_name, frame_cv) #画面表示
     # ESCキー(27)が押されたらループを抜ける
     if cv2.waitKey(1) & 0xFF == 27:
