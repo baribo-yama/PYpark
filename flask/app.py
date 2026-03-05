@@ -9,6 +9,7 @@ app = Flask(__name__)
 # main.pyの起動状態を管理
 ad_process = None
 kutipatti_process = None
+ascii_process = None
 
 # 広告スイーパー起動関数
 def start_ad_system():
@@ -23,18 +24,16 @@ def start_ad_system():
     # main.pyのパスを取得
     # app.pyのディレクトリから見た相対パス
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    print(current_dir)
-    parent_dir = os.path.dirname(current_dir)
-    print(parent_dir)
-    main_py_path = os.path.join(parent_dir, "annoying_ad", "main.py")
+    main_py_path = os.path.join(current_dir, "annoying_ad", "main.py")
 
     # main.pyをバックグラウンドで起動
     # cwdはcurrent workng directory　作業ディレクトリを指定する
     ad_process = subprocess.Popen(
         ["python", main_py_path],
-        cwd=os.path.join(parent_dir, "annoying_ad")
+        cwd=os.path.join(current_dir, "annoying_ad")
     )
-# くちぱっち起動関数
+
+# ascii起動関数
 def start_kutipatti():
     global kutipatti_process
 
@@ -49,6 +48,20 @@ def start_kutipatti():
         cwd=os.path.join(current_dir, "kutipatti")
     )
 
+# ascii起動関数
+def start_ascii():
+    global ascii_process
+
+    if ascii_process is not None and ascii_process.poll() is None:
+        return
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    main_py_path = os.path.join(current_dir, "ascii", "test_ascii.py")
+
+    _process = subprocess.Popen(
+        ["python", main_py_path],
+        cwd=os.path.join(current_dir, "ascii")
+    )
 
 @app.route("/")
 def index():
@@ -88,17 +101,17 @@ def carousel5():
 
 @app.route("/carousel6")
 def carousel6():
-    start_ad_system()
+    start_ascii()
     return render_template("carousel6.html")
 
 @app.route("/carousel7")
 def carousel7():
-    start_ad_system()
+
     return render_template("carousel7.html")
 
 @app.route("/carousel8")
 def carousel8():
-    start_ad_system()
+
     return render_template("carousel8.html")
 
 if __name__ == "__main__":

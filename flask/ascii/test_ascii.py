@@ -157,8 +157,19 @@ with mp_hands.Hands(
                         ty = y + (CELL_H + text_size[1]) // 2
                         cv2.putText(ascii_canvas, ch, (tx, ty), FONT, FONT_SCALE, (255, 255, 255), THICKNESS, cv2.LINE_AA)
 
+        # ウィンドウを作成（リサイズ可能にする）
+        window_name = "ASCII Hand"
+        cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+
+        # アプリ起動時にウィンドウを最前面に
+        # 引数の1は、topmostを有効にする、という意味らしい
+        cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
+
+        # ウィンドウサイズを指定
+        cv2.resizeWindow(window_name, 1280, 720)
+
         # 表示
-        cv2.imshow("ASCII Hand", ascii_canvas)
+        cv2.imshow(window_name, ascii_canvas)
 
         # qキーを押して終了
         key = cv2.waitKey(1) & 0xFF

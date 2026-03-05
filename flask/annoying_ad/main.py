@@ -11,7 +11,7 @@ from fuck_shutdown import check_middle_finger_gesture, is_fuck, draw_hand_landma
 enable_ads = True  # Trueで表示、Falseで非表示
 
 # fuckdownのオンオフ切り替え
-enable_fuckdown = False
+enable_fuckdown = True
 
 # Mediapipenの初期化
 mp_face = mp.solutions.face_detection
@@ -148,7 +148,7 @@ def main():
             if enable_fuckdown == True:
                 if is_fuck(hands_res, w, h):
                     print("fuck detected!!")
-                    shutdownText = "...fuck_you"
+                    shutdownText = "...system down..."
 
                     # テキストのサイズを取得
                     font = cv2.FONT_HERSHEY_TRIPLEX
